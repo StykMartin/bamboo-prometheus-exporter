@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class BearerTokenResolver {
 	private static final String TOKEN_QUERY_PARAM = "token";
 	private static final Pattern AUTHORIZATION_PATTERN = Pattern
-			.compile("^Bearer (?<" + TOKEN_QUERY_PARAM + ">[a-zA-Z0-9-._~+/]+=*)$", Pattern.CASE_INSENSITIVE);
+			.compile("^Bearer (?<" + TOKEN_QUERY_PARAM + ">[a-z0-9-._~+/]+=*)$", Pattern.CASE_INSENSITIVE);
 
 	public String resolve(HttpServletRequest request) {
 		String fromHeader = resolveHeaderToken(request.getHeader(HttpHeaders.AUTHORIZATION));
