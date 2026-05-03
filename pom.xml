@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.stykmartin</groupId>
     <artifactId>prom-bamboo-exporter</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.1.0</version>
     <packaging>atlassian-plugin</packaging>
 
     <name>Prometheus Observability for Bamboo</name>
@@ -26,7 +26,7 @@
         <connection>scm:git:https://github.com/StykMartin/bamboo-prometheus-exporter.git</connection>
         <developerConnection>scm:git:git@github.com:StykMartin/bamboo-prometheus-exporter.git</developerConnection>
         <url>https://github.com/StykMartin/bamboo-prometheus-exporter</url>
-        <tag>HEAD</tag>
+        <tag>v2.1.0</tag>
     </scm>
 
     <dependencies>
