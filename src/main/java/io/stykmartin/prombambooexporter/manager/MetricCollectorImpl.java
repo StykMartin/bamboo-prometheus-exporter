@@ -75,8 +75,8 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
             .create();
 
     private final Histogram finishedBuildsDuration = Histogram.build()
-            .name("bamboo_build_duration_histogram")
-            .help("Finished Builds Duration in ms")
+            .name("bamboo_build_duration_seconds")
+            .help("Finished Builds Duration in seconds")
             .labelNames("planKey")
             .create();
 
@@ -173,8 +173,8 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
     }
 
     @Override
-    public void finishedBuildsDuration(String planKey, long duration) {
-        finishedBuildsDuration.labels(planKey).observe(duration);
+    public void finishedBuildsDuration(String planKey, long durationMillis) {
+        finishedBuildsDuration.labels(planKey).observe(durationMillis / 1000.0);
     }
 
     @Override
