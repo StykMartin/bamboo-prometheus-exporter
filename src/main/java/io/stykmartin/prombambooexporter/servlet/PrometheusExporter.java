@@ -6,7 +6,6 @@ import io.stykmartin.prombambooexporter.manager.SecureTokenManager;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -18,22 +17,23 @@ import java.util.Set;
 public class PrometheusExporter extends HttpServlet {
     private final transient MetricCollector metricCollector;
     private final transient SecureTokenManager secureTokenManager;
+    private final transient BearerTokenResolver bearerTokenResolver;
 
     public PrometheusExporter(
             MetricCollector metricCollector,
-            SecureTokenManager secureTokenManager) {
+            SecureTokenManager secureTokenManager,
+            BearerTokenResolver bearerTokenResolver) {
         this.metricCollector = metricCollector;
         this.secureTokenManager = secureTokenManager;
+        this.bearerTokenResolver = bearerTokenResolver;
     }
 
     @Override
     protected void doGet(
             final HttpServletRequest httpServletRequest,
             final HttpServletResponse httpServletResponse) throws IOException {
-        String paramToken = httpServletRequest.getParameter("token");
-        String storedToken = secureTokenManager.getToken();
-
-        if (StringUtils.isNotBlank(storedToken) && !storedToken.equals(paramToken)) {
+        if (secureTokenManager.isConfigured()
+                && !secureTokenManager.matches(bearerTokenResolver.resolve(httpServletRequest))) {
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
