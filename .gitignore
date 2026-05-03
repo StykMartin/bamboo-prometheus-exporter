@@ -2,3 +2,4 @@
 .idea
 target
 prom-bamboo-exporter.iml
+atlassian-bamboo-agent-installer-*.jar
