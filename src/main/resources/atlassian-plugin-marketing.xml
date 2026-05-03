@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<atlassian-plugin-marketing>
+    <compatibility>
+        <product name="bamboo" min="12.0.0" max="12.1.6"/>
+    </compatibility>
+</atlassian-plugin-marketing>
