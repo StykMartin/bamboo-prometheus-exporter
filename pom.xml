@@ -25,9 +25,34 @@
     <scm>
         <connection>scm:git:https://github.com/StykMartin/bamboo-prometheus-exporter.git</connection>
         <developerConnection>scm:git:git@github.com:StykMartin/bamboo-prometheus-exporter.git</developerConnection>
-        <url>https://github.com/StykMartin/bamboo-prometheus-exporter</url>
         <tag>HEAD</tag>
+        <url>https://github.com/StykMartin/bamboo-prometheus-exporter</url>
     </scm>
+
+    <properties>
+        <bamboo.version>12.1.6</bamboo.version>
+        <bamboo.data.version>${bamboo.version}</bamboo.data.version>
+        <amps.version>9.12.4</amps.version>
+        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
+        <atlassian.spring.scanner.version>6.0.2</atlassian.spring.scanner.version>
+        <prometheus.version>0.16.0</prometheus.version>
+        <spotless.version>3.4.0</spotless.version>
+        <eclipse.jdt.version>4.35</eclipse.jdt.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
+                <version>2.10.9.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -80,15 +105,19 @@
         </dependency>
     </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>net.sf.ehcache</groupId>
-                <artifactId>ehcache</artifactId>
-                <version>2.10.9.2</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <repositories>
+        <repository>
+            <id>atlassian-public</id>
+            <url>https://packages.atlassian.com/maven-public/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>atlassian-public</id>
+            <url>https://packages.atlassian.com/maven-public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <plugins>
@@ -97,13 +126,6 @@
                 <artifactId>bamboo-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.glassfish.jaxb</groupId>
-                        <artifactId>jaxb-runtime</artifactId>
-                        <version>2.3.9</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
                     <productVersion>${bamboo.version}</productVersion>
                     <productDataVersion>${bamboo.data.version}</productDataVersion>
@@ -111,14 +133,19 @@
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Spring-Context>*</Spring-Context>
-                        <Export-Package />
-                        <Import-Package>
-                            org.springframework.osgi.*;resolution:="optional",
+                        <Export-Package/>
+                        <Import-Package>org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
-                            *;resolution:="optional"
-                        </Import-Package>
+                            *;resolution:="optional"</Import-Package>
                     </instructions>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.glassfish.jaxb</groupId>
+                        <artifactId>jaxb-runtime</artifactId>
+                        <version>2.3.9</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>com.atlassian.plugin</groupId>
@@ -147,33 +174,34 @@
                     <preparationGoals>clean verify</preparationGoals>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+                <configuration>
+                    <java>
+                        <eclipse>
+                            <version>${eclipse.jdt.version}</version>
+                        </eclipse>
+                        <removeUnusedImports/>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                    </java>
+                    <pom>
+                        <sortPom>
+                            <expandEmptyElements>false</expandEmptyElements>
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                        </sortPom>
+                    </pom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>atlassian-public</id>
-            <url>https://packages.atlassian.com/maven-public/</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>atlassian-public</id>
-            <url>https://packages.atlassian.com/maven-public/</url>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <properties>
-        <bamboo.version>12.1.6</bamboo.version>
-        <bamboo.data.version>${bamboo.version}</bamboo.data.version>
-        <amps.version>9.12.4</amps.version>
-        <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
-        <atlassian.spring.scanner.version>6.0.2</atlassian.spring.scanner.version>
-        <prometheus.version>0.16.0</prometheus.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
 </project>
