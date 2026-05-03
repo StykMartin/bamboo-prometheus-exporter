@@ -71,25 +71,22 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
     private final Counter finishedBuildsCounter = Counter.build()
             .name("bamboo_finished_build_count")
             .help("Finished Builds Count")
-            .labelNames("planKey", "state")
+            .labelNames("state")
             .create();
 
     private final Histogram finishedBuildsDuration = Histogram.build()
             .name("bamboo_build_duration_seconds")
             .help("Finished Builds Duration in seconds")
-            .labelNames("planKey")
             .create();
 
     private final Counter canceledBuildsCounter = Counter.build()
             .name("bamboo_canceled_build_count")
             .help("Canceled Builds Count")
-            .labelNames("planKey")
             .create();
 
     private final Counter buildQueueTimeoutCounter = Counter.build()
             .name("bamboo_build_queue_timeout_count")
             .help("Build Queue Timeout Count")
-            .labelNames("planKey")
             .create();
 
     //--> Deploys
@@ -97,7 +94,7 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
     private final Counter finishedDeploysCounter = Counter.build()
             .name("bamboo_finished_deploys_count")
             .help("Finished Deploys Count")
-            .labelNames("planKey", "state")
+            .labelNames("state")
             .create();
 
     //--> License
@@ -168,30 +165,30 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
     //--> Builds
 
     @Override
-    public void finishedBuildsCounter(String planKey, String state) {
-        finishedBuildsCounter.labels(planKey, state).inc();
+    public void finishedBuildsCounter(String state) {
+        finishedBuildsCounter.labels(state).inc();
     }
 
     @Override
-    public void finishedBuildsDuration(String planKey, long durationMillis) {
-        finishedBuildsDuration.labels(planKey).observe(durationMillis / 1000.0);
+    public void finishedBuildsDuration(long durationMillis) {
+        finishedBuildsDuration.observe(durationMillis / 1000.0);
     }
 
     @Override
-    public void canceledBuildsCounter(String planKey) {
-        canceledBuildsCounter.labels(planKey).inc();
+    public void canceledBuildsCounter() {
+        canceledBuildsCounter.inc();
     }
 
     @Override
-    public void buildQueueTimeoutCounter(String planKey) {
-        buildQueueTimeoutCounter.labels(planKey).inc();
+    public void buildQueueTimeoutCounter() {
+        buildQueueTimeoutCounter.inc();
     }
 
     //--> Deploys
 
     @Override
-    public void finishedDeploysCounter(String planKey, String state) {
-        finishedDeploysCounter.labels(planKey, state).inc();
+    public void finishedDeploysCounter(String state) {
+        finishedDeploysCounter.labels(state).inc();
     }
 
     //--> Collect

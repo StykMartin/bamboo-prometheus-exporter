@@ -1,8 +1,6 @@
 package io.stykmartin.prombambooexporter.listener;
 
 import com.atlassian.bamboo.deployments.execution.events.DeploymentFinishedEvent;
-import com.atlassian.bamboo.deployments.projects.DeploymentProject;
-import com.atlassian.bamboo.deployments.projects.service.DeploymentProjectService;
 import com.atlassian.bamboo.deployments.results.DeploymentResult;
 import com.atlassian.bamboo.deployments.results.service.DeploymentResultService;
 import com.atlassian.bamboo.event.BambooErrorEvent;
@@ -24,7 +22,6 @@ import jakarta.inject.Inject;
 public class MetricListener {
     private final MetricCollector metricCollector;
     private final DeploymentResultService deploymentResultService;
-    private final DeploymentProjectService deploymentProjectService;
     private final ResultsSummaryManager resultsSummaryManager;
     private final EventPublisher eventPublisher;
 
@@ -32,12 +29,10 @@ public class MetricListener {
     public MetricListener(
             MetricCollector metricCollector,
             @BambooImport DeploymentResultService deploymentResultService,
-            @BambooImport DeploymentProjectService deploymentProjectService,
             @BambooImport ResultsSummaryManager resultsSummaryManager,
             @BambooImport EventPublisher eventPublisher) {
         this.metricCollector = metricCollector;
         this.deploymentResultService = deploymentResultService;
-        this.deploymentProjectService = deploymentProjectService;
         this.resultsSummaryManager = resultsSummaryManager;
         this.eventPublisher = eventPublisher;
     }
@@ -59,13 +54,13 @@ public class MetricListener {
         if (summary != null) {
             duration = summary.getDuration();
         }
-        metricCollector.finishedBuildsCounter(buildFinishedEvent.getBuildPlanKey(), buildFinishedEvent.getBuildState().name());
-        metricCollector.finishedBuildsDuration(buildFinishedEvent.getBuildPlanKey(), duration);
+        metricCollector.finishedBuildsCounter(buildFinishedEvent.getBuildState().name());
+        metricCollector.finishedBuildsDuration(duration);
     }
 
     @EventListener
     public void buildCanceledEvent(BuildCanceledEvent buildCanceledEvent) {
-        metricCollector.canceledBuildsCounter(buildCanceledEvent.getBuildPlanKey());
+        metricCollector.canceledBuildsCounter();
     }
 
     @EventListener
@@ -75,7 +70,7 @@ public class MetricListener {
 
     @EventListener
     public void buildQueueTimeoutEvent(BuildQueueTimeoutEvent buildQueueTimeoutEvent) {
-        metricCollector.buildQueueTimeoutCounter(buildQueueTimeoutEvent.getBuildPlanKey());
+        metricCollector.buildQueueTimeoutCounter();
     }
 
     @EventListener
@@ -84,9 +79,6 @@ public class MetricListener {
         if (deploymentResult == null) {
             return;
         }
-        DeploymentProject deploymentProject = deploymentProjectService.getDeploymentProject(deploymentResult.getEnvironment().getDeploymentProjectId());
-        if (deploymentProject != null) {
-            metricCollector.finishedDeploysCounter(deploymentProject.getPlanKey().getKey(), deploymentResult.getDeploymentState().name());
-        }
+        metricCollector.finishedDeploysCounter(deploymentResult.getDeploymentState().name());
     }
 }
