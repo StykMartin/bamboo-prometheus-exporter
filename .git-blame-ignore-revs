@@ -1,0 +1,5 @@
+# Bulk reformats — ignored when running `git blame`.
+# Enable locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: format codebase with spotless
+666db85f78e0008287e92b56ced8cd03c8c58390
