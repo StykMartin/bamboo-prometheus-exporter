@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 @BambooComponent
 public class BearerTokenResolver {
 	private static final String TOKEN_QUERY_PARAM = "token";
-	private static final Pattern AUTHORIZATION_PATTERN = Pattern.compile("^Bearer (?<token>[a-zA-Z0-9-._~+/]+=*)$",
-			Pattern.CASE_INSENSITIVE);
+	private static final Pattern AUTHORIZATION_PATTERN = Pattern
+			.compile("^Bearer (?<" + TOKEN_QUERY_PARAM + ">[a-zA-Z0-9-._~+/]+=*)$", Pattern.CASE_INSENSITIVE);
 
 	public String resolve(HttpServletRequest request) {
 		String fromHeader = resolveHeaderToken(request.getHeader(HttpHeaders.AUTHORIZATION));
@@ -28,6 +28,6 @@ public class BearerTokenResolver {
 			return null;
 		}
 		Matcher matcher = AUTHORIZATION_PATTERN.matcher(authorizationHeader);
-		return matcher.matches() ? matcher.group("token") : null;
+		return matcher.matches() ? matcher.group(TOKEN_QUERY_PARAM) : null;
 	}
 }
