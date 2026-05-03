@@ -1,3 +1,16 @@
-# Prometheus Observability for Bamboo [![Build](https://github.com/StykMartin/bamboo-prometheus-exporter/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/StykMartin/bamboo-prometheus-exporter/actions/workflows/build.yml)
+<p align="center">
+  <img src=".github/social-preview.jpg" alt="Bamboo Prometheus Exporter" width="100%">
+</p>
 
-Atlassian Bamboo plugin that exposes build, deployment, agent, and license metrics on a Prometheus scrape endpoint.
+---
+
+<p align="center">
+  <b>Prometheus metrics for Atlassian Bamboo</b><br>
+  <i>Pipeline health on a single scrape endpoint</i>
+</p>
+
+---
+
+## Overview
+
+Atlassian Bamboo plugin that exposes operational metrics on a Prometheus scrape endpoint.
