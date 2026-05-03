@@ -133,7 +133,7 @@
                     <instructions>
                         <Atlassian-Plugin-Key>${atlassian.plugin.key}</Atlassian-Plugin-Key>
                         <Spring-Context>*</Spring-Context>
-                        <Export-Package/>
+                        <Export-Package />
                         <Import-Package>org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             *;resolution:="optional"</Import-Package>
@@ -183,13 +183,14 @@
                         <eclipse>
                             <version>${eclipse.jdt.version}</version>
                         </eclipse>
-                        <removeUnusedImports/>
-                        <trimTrailingWhitespace/>
-                        <endWithNewline/>
+                        <removeUnusedImports />
+                        <trimTrailingWhitespace />
+                        <endWithNewline />
                     </java>
                     <pom>
                         <sortPom>
                             <expandEmptyElements>false</expandEmptyElements>
+                            <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
                             <nrOfIndentSpace>4</nrOfIndentSpace>
                         </sortPom>
                     </pom>
