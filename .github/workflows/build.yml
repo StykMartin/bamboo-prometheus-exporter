@@ -57,7 +57,7 @@ jobs:
         run: echo "$GITHUB_WORKSPACE/opt/atlassian-plugin-sdk/bin" >> "$GITHUB_PATH"
 
       - name: Package plugin
-        run: atlas-package -Dtools.jar="$JAVA_HOME/lib/jrt-fs.jar"
+        run: atlas-package
 
       - name: Upload plugin artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

@@ -1,4 +1,4 @@
-package ru.andreymarkelov.atlas.plugins.prombambooexporter.manager;
+package io.stykmartin.prombambooexporter.manager;
 
 import com.atlassian.plugin.spring.scanner.annotation.component.BambooComponent;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;

@@ -3,56 +3,45 @@
         <description>${project.description}</description>
         <version>${project.version}</version>
         <vendor name="${project.organization.name}" url="${project.organization.url}" />
-        <param name="plugin-logo">/ru/andreymarkelov/atlas/plugins/prombambooexporter/images/prom-exporter.png</param>
-        <param name="plugin-icon">/ru/andreymarkelov/atlas/plugins/prombambooexporter/images/prom-exporter-sm.png</param>
-        <param name="vendor-icon">/ru/andreymarkelov/atlas/plugins/prombambooexporter/images/32.jpg</param>
-        <param name="vendor-logo">/ru/andreymarkelov/atlas/plugins/prombambooexporter/images/144.jpg</param>
-        <param name="plugin-banner">/ru/andreymarkelov/atlas/plugins/prombambooexporter/images/banner.png</param>
+        <param name="plugin-logo">/io/stykmartin/prombambooexporter/images/prom-exporter.png</param>
+        <param name="plugin-icon">/io/stykmartin/prombambooexporter/images/prom-exporter-sm.png</param>
+        <param name="plugin-banner">/io/stykmartin/prombambooexporter/images/banner.png</param>
         <param name="configure.url">/admin/prommetrics/settings.action</param>
         <param name="atlassian-data-center-compatible">true</param>
     </plugin-info>
 
     <!-- I18N -->
-    <resource type="i18n" name="i18n" location="ru.andreymarkelov.atlas.plugins.prombambooexporter.i18n.prom-bamboo-exporter"/>
-
-    <!-- Web Resources -->
-    <web-resource key="prom-bamboo-exporter-resources" name="prom-bamboo-exporter Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <resource type="download" name="prom-bamboo-exporter.css" location="/ru/andreymarkelov/atlas/plugins/prombambooexporter/css/prom-bamboo-exporter.css"/>
-        <resource type="download" name="prom-bamboo-exporter.js" location="/ru/andreymarkelov/atlas/plugins/prombambooexporter/js/prom-bamboo-exporter.js"/>
-        <resource type="download" name="images/" location="/ru/andreymarkelov/atlas/plugins/prombambooexporter/images"/>
-        <context>prom-bamboo-exporter</context>
-    </web-resource>
+    <resource type="i18n" name="i18n" location="io.stykmartin.prombambooexporter.i18n.prom-bamboo-exporter"/>
 
     <!-- Web Items -->
     <web-item name="Security Token Admin Settings Link" key="prom-bamboo-exporter-configuration" section="system.admin/plugins" weight="100">
-        <label key="ru.andreymarkelov.atlas.plugins.prombambooexporter.admin.section"/>
-        <description key="ru.andreymarkelov.atlas.plugins.prombambooexporter.admin.section.desc"/>
+        <label key="io.stykmartin.prombambooexporter.admin.section"/>
+        <description key="io.stykmartin.prombambooexporter.admin.section.desc"/>
         <link linkId="prom-bamboo-exporter-configuration">/admin/prommetrics/settings.action</link>
     </web-item>
 
     <!-- Actions -->
     <xwork name="Security Token Actions" key="prom-bamboo-exporter-actions">
         <package name="prom-bamboo-exporter-action-admin" extends="admin" namespace="/admin/prommetrics">
-            <action name="settings" class="ru.andreymarkelov.atlas.plugins.prombambooexporter.action.admin.SecureTokenConfigAction" method="input">
-                <result name="input" type="freemarker">/ru/andreymarkelov/atlas/plugins/prombambooexporter/templates/admin/settings.ftl</result>
-                <result name="error" type="freemarker">/ru/andreymarkelov/atlas/plugins/prombambooexporter/templates/admin/settings.ftl</result>
+            <action name="settings" class="io.stykmartin.prombambooexporter.action.admin.SecureTokenConfigAction" method="input">
+                <result name="input" type="freemarker">/io/stykmartin/prombambooexporter/templates/admin/settings.ftl</result>
+                <result name="error" type="freemarker">/io/stykmartin/prombambooexporter/templates/admin/settings.ftl</result>
             </action>
-            <action name="savesettings" class="ru.andreymarkelov.atlas.plugins.prombambooexporter.action.admin.SecureTokenConfigAction">
-                <result name="error" type="freemarker">/ru/andreymarkelov/atlas/plugins/prombambooexporter/templates/admin/settings.ftl</result>
-                <result name="success" type="freemarker">/ru/andreymarkelov/atlas/plugins/prombambooexporter/templates/admin/settings.ftl</result>
+            <action name="savesettings" class="io.stykmartin.prombambooexporter.action.admin.SecureTokenConfigAction">
+                <result name="error" type="freemarker">/io/stykmartin/prombambooexporter/templates/admin/settings.ftl</result>
+                <result name="success" type="freemarker">/io/stykmartin/prombambooexporter/templates/admin/settings.ftl</result>
             </action>
         </package>
     </xwork>
 
     <!-- Servlets -->
-    <servlet name="Exporter Servlet" key="prom-bamboo-exporter-servlet" class="ru.andreymarkelov.atlas.plugins.prombambooexporter.servlet.PrometheusExporter">
+    <servlet name="Exporter Servlet" key="prom-bamboo-exporter-servlet" class="io.stykmartin.prombambooexporter.servlet.PrometheusExporter">
         <url-pattern>/prometheus/metrics</url-pattern>
     </servlet>
 
     <!-- Freemarker member access allowlist (Bamboo 12+) -->
     <freemarkerAllowlist key="freemarkerAllowlist">
-        <method>ru.andreymarkelov.atlas.plugins.prombambooexporter.action.admin.SecureTokenConfigAction.getToken()</method>
-        <method>ru.andreymarkelov.atlas.plugins.prombambooexporter.action.admin.SecureTokenConfigAction.isSaved()</method>
+        <method>io.stykmartin.prombambooexporter.action.admin.SecureTokenConfigAction.getToken()</method>
+        <method>io.stykmartin.prombambooexporter.action.admin.SecureTokenConfigAction.isSaved()</method>
     </freemarkerAllowlist>
 </atlassian-plugin>

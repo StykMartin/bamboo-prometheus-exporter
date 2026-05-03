@@ -1,4 +1,4 @@
-package ru.andreymarkelov.atlas.plugins.prombambooexporter.listener;
+package io.stykmartin.prombambooexporter.listener;
 
 import com.atlassian.bamboo.deployments.execution.events.DeploymentFinishedEvent;
 import com.atlassian.bamboo.deployments.projects.DeploymentProject;
@@ -15,10 +15,10 @@ import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.plugin.spring.scanner.annotation.component.BambooComponent;
 import com.atlassian.plugin.spring.scanner.annotation.imports.BambooImport;
+import io.stykmartin.prombambooexporter.manager.MetricCollector;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
-import ru.andreymarkelov.atlas.plugins.prombambooexporter.manager.MetricCollector;
 
 @BambooComponent
 public class MetricListener {

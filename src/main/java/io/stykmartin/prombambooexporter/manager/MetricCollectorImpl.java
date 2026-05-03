@@ -1,4 +1,4 @@
-package ru.andreymarkelov.atlas.plugins.prombambooexporter.manager;
+package io.stykmartin.prombambooexporter.manager;
 
 import com.atlassian.bamboo.NodeLifecycleProvider;
 import com.atlassian.bamboo.buildqueue.manager.AgentManager;

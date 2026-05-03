@@ -1,4 +1,4 @@
-package ru.andreymarkelov.atlas.plugins.prombambooexporter.manager;
+package io.stykmartin.prombambooexporter.manager;
 
 import io.prometheus.client.CollectorRegistry;
 

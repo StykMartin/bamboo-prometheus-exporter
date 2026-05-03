@@ -1,12 +1,12 @@
-package ru.andreymarkelov.atlas.plugins.prombambooexporter.servlet;
+package io.stykmartin.prombambooexporter.servlet;
 
 import io.prometheus.client.exporter.common.TextFormat;
+import io.stykmartin.prombambooexporter.manager.MetricCollector;
+import io.stykmartin.prombambooexporter.manager.SecureTokenManager;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import ru.andreymarkelov.atlas.plugins.prombambooexporter.manager.MetricCollector;
-import ru.andreymarkelov.atlas.plugins.prombambooexporter.manager.SecureTokenManager;
 
 import java.io.IOException;
 import java.io.Writer;

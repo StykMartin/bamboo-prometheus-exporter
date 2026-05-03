@@ -1,14 +1,14 @@
-package ru.andreymarkelov.atlas.plugins.prombambooexporter.action.admin;
+package io.stykmartin.prombambooexporter.action.admin;
 
 import com.atlassian.bamboo.configuration.GlobalAdminAction;
 import com.atlassian.bamboo.security.BambooPermissionManager;
 import com.atlassian.bamboo.user.BambooAuthenticationContext;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.user.User;
+import io.stykmartin.prombambooexporter.manager.SecureTokenManager;
 import org.apache.struts2.ActionContext;
 import org.apache.struts2.Preparable;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
-import ru.andreymarkelov.atlas.plugins.prombambooexporter.manager.SecureTokenManager;
 
 public class SecureTokenConfigAction extends GlobalAdminAction implements Preparable {
     private final transient SecureTokenManager secureTokenManager;
