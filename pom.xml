@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>ru.andreymarkelov.atlas.plugins</groupId>
     <artifactId>prom-bamboo-exporter</artifactId>
-    <version>1.0.8</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>atlassian-plugin</packaging>
 
     <name>Prometheus Exporter For Bamboo</name>
@@ -15,6 +15,13 @@
         <name>Andrey Markelov</name>
         <url>http://ru.linkedin.com/in/andreymarkelov/</url>
     </organization>
+
+    <scm>
+        <connection>scm:git:https://github.com/StykMartin/bamboo-prometheus-exporter.git</connection>
+        <developerConnection>scm:git:git@github.com:StykMartin/bamboo-prometheus-exporter.git</developerConnection>
+        <url>https://github.com/StykMartin/bamboo-prometheus-exporter</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -114,6 +121,17 @@
                         <phase>process-classes</phase>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <pushChanges>true</pushChanges>
+                    <localCheckout>true</localCheckout>
+                    <preparationGoals>clean verify</preparationGoals>
+                </configuration>
             </plugin>
         </plugins>
     </build>
