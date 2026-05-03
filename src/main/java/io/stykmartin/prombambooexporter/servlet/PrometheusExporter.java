@@ -49,11 +49,6 @@ public class PrometheusExporter extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        doGet(httpServletRequest, httpServletResponse);
-    }
-
     private Set<String> parse(HttpServletRequest httpServletRequest) {
         String[] includedParam = httpServletRequest.getParameterValues("name[]");
         if (includedParam == null) {
