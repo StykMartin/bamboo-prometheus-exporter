@@ -5,6 +5,7 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -13,7 +14,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 @BambooComponent
-public class SecureTokenManagerImpl implements SecureTokenManager {
+public class SecureTokenManagerImpl implements SecureTokenManager, InitializingBean {
     private static final String LEGACY_TOKEN_KEY = "PLUGIN_PROMETHEUS_FOR_BAMBOO_SECURITY_TOKEN";
     private static final String SALT_KEY = "PLUGIN_PROMETHEUS_FOR_BAMBOO_SECURITY_TOKEN_SALT_B64";
     private static final String HASH_KEY = "PLUGIN_PROMETHEUS_FOR_BAMBOO_SECURITY_TOKEN_HASH_B64";
@@ -69,13 +70,17 @@ public class SecureTokenManagerImpl implements SecureTokenManager {
         if (StringUtils.isBlank(legacy)) {
             return false;
         }
-        boolean ok = MessageDigest.isEqual(
+        return MessageDigest.isEqual(
                 legacy.getBytes(StandardCharsets.UTF_8),
                 candidate.getBytes(StandardCharsets.UTF_8));
-        if (ok) {
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        String legacy = readString(getPluginSettings(), LEGACY_TOKEN_KEY);
+        if (StringUtils.isNotBlank(legacy)) {
             setToken(legacy);
         }
-        return ok;
     }
 
     private byte[] hash(byte[] salt, byte[] tokenBytes) {
