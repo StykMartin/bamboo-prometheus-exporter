@@ -220,8 +220,8 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
 		long start = System.currentTimeMillis();
 		try {
 			return collectInternal();
-		} catch (Throwable throwable) {
-			log.error("Error collect prometheus metrics", throwable);
+		} catch (Exception e) {
+			log.error("Error collect prometheus metrics", e);
 			return emptyList();
 		} finally {
 			log.debug("Collect execution time is: {}ms", System.currentTimeMillis() - start);
