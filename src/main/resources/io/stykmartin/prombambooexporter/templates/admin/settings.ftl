@@ -14,7 +14,7 @@
                 <p>
                     <span class="aui-icon aui-icon-small aui-iconfont-info"></span>
                     ${action.getText('io.stykmartin.prombambooexporter.admin.settings.linkdesc')}
-                    <a target="_blank" href="${baseurl}/plugins/servlet/prometheus/metrics[#if token??]?token=${token}[/#if]">
+                    <a target="_blank" href="${baseurl}/plugins/servlet/prometheus/metrics">
                         ${action.getText('io.stykmartin.prombambooexporter.admin.settings.link')}
                     </a>.
                 </p>
@@ -32,17 +32,32 @@
                     </p>
                 </div>
                 [/#if]
+                [#if action.tokenConfigured]
+                <div class="aui-message aui-message-info">
+                    <p>${action.getText('io.stykmartin.prombambooexporter.admin.settings.status.configured')}</p>
+                </div>
+                [#else]
+                <div class="aui-message aui-message-warning">
+                    <p>${action.getText('io.stykmartin.prombambooexporter.admin.settings.status.open')}</p>
+                </div>
+                [/#if]
                 <div id="base-form">
                     [@ww.form
                         action="savesettings"
                         id="saveSettingsForm"
                         submitLabelKey='io.stykmartin.prombambooexporter.admin.settings.actions.save'
                     ]
-                        [@ww.textfield
+                        [@ww.password
                             labelKey="io.stykmartin.prombambooexporter.admin.settings.token"
                             name="token"
                             required=false
+                            showPassword=true
                             descriptionKey="io.stykmartin.prombambooexporter.admin.settings.token.desc"
+                        /]
+                        [@ww.checkbox
+                            labelKey="io.stykmartin.prombambooexporter.admin.settings.clear"
+                            name="clear"
+                            descriptionKey="io.stykmartin.prombambooexporter.admin.settings.clear.desc"
                         /]
                     [/@ww.form]
                 </div>

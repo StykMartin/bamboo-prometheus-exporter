@@ -6,6 +6,7 @@ import com.atlassian.bamboo.user.BambooAuthenticationContext;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.user.User;
 import io.stykmartin.prombambooexporter.manager.SecureTokenManager;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.ActionContext;
 import org.apache.struts2.Preparable;
 import org.apache.struts2.interceptor.parameter.StrutsParameter;
@@ -17,6 +18,7 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
 
     private boolean saved;
     private String token;
+    private boolean clear;
 
     public SecureTokenConfigAction(
             SecureTokenManager secureTokenManager,
@@ -33,14 +35,22 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
         if (user == null || !bambooPermissionManager.isAdmin(user.getName())) {
             return ERROR;
         }
-        secureTokenManager.setToken(token);
-        saved = true;
+        if (clear) {
+            secureTokenManager.setToken("");
+            saved = true;
+        } else if (StringUtils.isNotBlank(token)) {
+            secureTokenManager.setToken(token);
+            saved = true;
+        }
+        token = null;
+        clear = false;
         return SUCCESS;
     }
 
     @Override
     public String input() {
-        token = secureTokenManager.getToken();
+        token = null;
+        clear = false;
         saved = false;
         return INPUT;
     }
@@ -58,6 +68,10 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
         this.saved = saved;
     }
 
+    public boolean isTokenConfigured() {
+        return secureTokenManager.isConfigured();
+    }
+
     public String getToken() {
         return token;
     }
@@ -65,5 +79,14 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
     @StrutsParameter
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public boolean isClear() {
+        return clear;
+    }
+
+    @StrutsParameter
+    public void setClear(boolean clear) {
+        this.clear = clear;
     }
 }

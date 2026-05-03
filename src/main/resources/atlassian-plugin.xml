@@ -41,7 +41,7 @@
 
     <!-- Freemarker member access allowlist (Bamboo 12+) -->
     <freemarkerAllowlist key="freemarkerAllowlist">
-        <method>io.stykmartin.prombambooexporter.action.admin.SecureTokenConfigAction.getToken()</method>
         <method>io.stykmartin.prombambooexporter.action.admin.SecureTokenConfigAction.isSaved()</method>
+        <method>io.stykmartin.prombambooexporter.action.admin.SecureTokenConfigAction.isTokenConfigured()</method>
     </freemarkerAllowlist>
 </atlassian-plugin>
