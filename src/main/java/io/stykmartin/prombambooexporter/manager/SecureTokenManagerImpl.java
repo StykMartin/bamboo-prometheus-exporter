@@ -47,8 +47,8 @@ public class SecureTokenManagerImpl implements SecureTokenManager, InitializingB
     @Override
     public boolean isConfigured() {
         PluginSettings settings = getPluginSettings();
-        return readString(settings, HASH_KEY) != null
-                || StringUtils.isNotBlank(readString(settings, LEGACY_TOKEN_KEY));
+        return readString(settings, SALT_KEY) != null
+                && readString(settings, HASH_KEY) != null;
     }
 
     @Override
@@ -59,20 +59,14 @@ public class SecureTokenManagerImpl implements SecureTokenManager, InitializingB
         PluginSettings settings = getPluginSettings();
         String saltB64 = readString(settings, SALT_KEY);
         String hashB64 = readString(settings, HASH_KEY);
-        if (saltB64 != null && hashB64 != null) {
-            byte[] expected = Base64.getDecoder().decode(hashB64);
-            byte[] actual = hash(
-                    Base64.getDecoder().decode(saltB64),
-                    candidate.getBytes(StandardCharsets.UTF_8));
-            return MessageDigest.isEqual(expected, actual);
-        }
-        String legacy = readString(settings, LEGACY_TOKEN_KEY);
-        if (StringUtils.isBlank(legacy)) {
+        if (saltB64 == null || hashB64 == null) {
             return false;
         }
-        return MessageDigest.isEqual(
-                legacy.getBytes(StandardCharsets.UTF_8),
+        byte[] expected = Base64.getDecoder().decode(hashB64);
+        byte[] actual = hash(
+                Base64.getDecoder().decode(saltB64),
                 candidate.getBytes(StandardCharsets.UTF_8));
+        return MessageDigest.isEqual(expected, actual);
     }
 
     @Override
