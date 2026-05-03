@@ -10,24 +10,24 @@ import java.util.regex.Pattern;
 
 @BambooComponent
 public class BearerTokenResolver {
-    private static final String TOKEN_QUERY_PARAM = "token";
-    private static final Pattern AUTHORIZATION_PATTERN = Pattern.compile(
-            "^Bearer (?<token>[a-zA-Z0-9-._~+/]+=*)$", Pattern.CASE_INSENSITIVE);
+	private static final String TOKEN_QUERY_PARAM = "token";
+	private static final Pattern AUTHORIZATION_PATTERN = Pattern.compile("^Bearer (?<token>[a-zA-Z0-9-._~+/]+=*)$",
+			Pattern.CASE_INSENSITIVE);
 
-    public String resolve(HttpServletRequest request) {
-        String fromHeader = resolveHeaderToken(request.getHeader(HttpHeaders.AUTHORIZATION));
-        String fromQuery = request.getParameter(TOKEN_QUERY_PARAM);
-        if (fromHeader != null && StringUtils.isNotBlank(fromQuery)) {
-            return null;
-        }
-        return fromHeader != null ? fromHeader : fromQuery;
-    }
+	public String resolve(HttpServletRequest request) {
+		String fromHeader = resolveHeaderToken(request.getHeader(HttpHeaders.AUTHORIZATION));
+		String fromQuery = request.getParameter(TOKEN_QUERY_PARAM);
+		if (fromHeader != null && StringUtils.isNotBlank(fromQuery)) {
+			return null;
+		}
+		return fromHeader != null ? fromHeader : fromQuery;
+	}
 
-    private String resolveHeaderToken(String authorizationHeader) {
-        if (authorizationHeader == null) {
-            return null;
-        }
-        Matcher matcher = AUTHORIZATION_PATTERN.matcher(authorizationHeader);
-        return matcher.matches() ? matcher.group("token") : null;
-    }
+	private String resolveHeaderToken(String authorizationHeader) {
+		if (authorizationHeader == null) {
+			return null;
+		}
+		Matcher matcher = AUTHORIZATION_PATTERN.matcher(authorizationHeader);
+		return matcher.matches() ? matcher.group("token") : null;
+	}
 }

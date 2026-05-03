@@ -17,44 +17,42 @@ import java.util.Set;
 
 @UnrestrictedAccess
 public class PrometheusExporter extends HttpServlet {
-    private final transient MetricCollector metricCollector;
-    private final transient SecureTokenManager secureTokenManager;
-    private final transient BearerTokenResolver bearerTokenResolver;
+	private final transient MetricCollector metricCollector;
+	private final transient SecureTokenManager secureTokenManager;
+	private final transient BearerTokenResolver bearerTokenResolver;
 
-    public PrometheusExporter(
-            MetricCollector metricCollector,
-            SecureTokenManager secureTokenManager,
-            BearerTokenResolver bearerTokenResolver) {
-        this.metricCollector = metricCollector;
-        this.secureTokenManager = secureTokenManager;
-        this.bearerTokenResolver = bearerTokenResolver;
-    }
+	public PrometheusExporter(MetricCollector metricCollector, SecureTokenManager secureTokenManager,
+			BearerTokenResolver bearerTokenResolver) {
+		this.metricCollector = metricCollector;
+		this.secureTokenManager = secureTokenManager;
+		this.bearerTokenResolver = bearerTokenResolver;
+	}
 
-    @Override
-    protected void doGet(
-            final HttpServletRequest httpServletRequest,
-            final HttpServletResponse httpServletResponse) throws IOException {
-        if (secureTokenManager.isConfigured()
-                && !secureTokenManager.matches(bearerTokenResolver.resolve(httpServletRequest))) {
-            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+	@Override
+	protected void doGet(final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse)
+			throws IOException {
+		if (secureTokenManager.isConfigured()
+				&& !secureTokenManager.matches(bearerTokenResolver.resolve(httpServletRequest))) {
+			httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
 
-        httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-        httpServletResponse.setContentType(TextFormat.CONTENT_TYPE_004);
+		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+		httpServletResponse.setContentType(TextFormat.CONTENT_TYPE_004);
 
-        try (Writer writer = httpServletResponse.getWriter()) {
-            TextFormat.write004(writer, metricCollector.getRegistry().filteredMetricFamilySamples(parse(httpServletRequest)));
-            writer.flush();
-        }
-    }
+		try (Writer writer = httpServletResponse.getWriter()) {
+			TextFormat.write004(writer,
+					metricCollector.getRegistry().filteredMetricFamilySamples(parse(httpServletRequest)));
+			writer.flush();
+		}
+	}
 
-    private Set<String> parse(HttpServletRequest httpServletRequest) {
-        String[] includedParam = httpServletRequest.getParameterValues("name[]");
-        if (includedParam == null) {
-            return Collections.emptySet();
-        } else {
-            return new HashSet<>(Arrays.asList(includedParam));
-        }
-    }
+	private Set<String> parse(HttpServletRequest httpServletRequest) {
+		String[] includedParam = httpServletRequest.getParameterValues("name[]");
+		if (includedParam == null) {
+			return Collections.emptySet();
+		} else {
+			return new HashSet<>(Arrays.asList(includedParam));
+		}
+	}
 }

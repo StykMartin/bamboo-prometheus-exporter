@@ -27,258 +27,220 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @BambooComponent
 public class MetricCollectorImpl extends Collector implements MetricCollector, InitializingBean, DisposableBean {
-    private static final Logger log = LoggerFactory.getLogger(MetricCollectorImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(MetricCollectorImpl.class);
 
-    private final CollectorRegistry registry;
-    private final BambooLicenseManager bambooLicenseManager;
-    private final AgentManager agentManager;
-    private final NonBlockingPlanExecutionService nonBlockingPlanExecutionService;
-    private final PlanManager planManager;
-    private final NodeLifecycleProvider nodeLifecycleProvider;
+	private final CollectorRegistry registry;
+	private final BambooLicenseManager bambooLicenseManager;
+	private final AgentManager agentManager;
+	private final NonBlockingPlanExecutionService nonBlockingPlanExecutionService;
+	private final PlanManager planManager;
+	private final NodeLifecycleProvider nodeLifecycleProvider;
 
-    //--> Common
+	// --> Common
 
-    private final Counter errorsCounter = Counter.build()
-            .name("bamboo_error_count")
-            .help("Errors Count")
-            .labelNames("isNew")
-            .create();
+	private final Counter errorsCounter = Counter.build().name("bamboo_error_count").help("Errors Count")
+			.labelNames("isNew").create();
 
-    private final Gauge lifecycleStateGauge = Gauge.build()
-            .name("bamboo_lifecycle_state_gauge")
-            .help("Lifecycle State")
-            .create();
+	private final Gauge lifecycleStateGauge = Gauge.build().name("bamboo_lifecycle_state_gauge").help("Lifecycle State")
+			.create();
 
-    //--> Agents
+	// --> Agents
 
-    private final Gauge allAgentsGauge = Gauge.build()
-            .name("bamboo_all_agents_gauge")
-            .help("All Agents Gauge")
-            .create();
+	private final Gauge allAgentsGauge = Gauge.build().name("bamboo_all_agents_gauge").help("All Agents Gauge")
+			.create();
 
-    private final Gauge activeAgentsGauge = Gauge.build()
-            .name("bamboo_active_agents_gauge")
-            .help("Active Agents Gauge")
-            .create();
+	private final Gauge activeAgentsGauge = Gauge.build().name("bamboo_active_agents_gauge").help("Active Agents Gauge")
+			.create();
 
-    private final Gauge busyAgentsGauge = Gauge.build()
-            .name("bamboo_busy_agents_gauge")
-            .help("Busy Agents Gauge")
-            .create();
+	private final Gauge busyAgentsGauge = Gauge.build().name("bamboo_busy_agents_gauge").help("Busy Agents Gauge")
+			.create();
 
-    //--> Builds
+	// --> Builds
 
-    private final Counter finishedBuildsCounter = Counter.build()
-            .name("bamboo_finished_build_count")
-            .help("Finished Builds Count")
-            .labelNames("state")
-            .create();
+	private final Counter finishedBuildsCounter = Counter.build().name("bamboo_finished_build_count")
+			.help("Finished Builds Count").labelNames("state").create();
 
-    private final Histogram finishedBuildsDuration = Histogram.build()
-            .name("bamboo_build_duration_seconds")
-            .help("Finished Builds Duration in seconds")
-            .create();
+	private final Histogram finishedBuildsDuration = Histogram.build().name("bamboo_build_duration_seconds")
+			.help("Finished Builds Duration in seconds").create();
 
-    private final Counter canceledBuildsCounter = Counter.build()
-            .name("bamboo_canceled_build_count")
-            .help("Canceled Builds Count")
-            .create();
+	private final Counter canceledBuildsCounter = Counter.build().name("bamboo_canceled_build_count")
+			.help("Canceled Builds Count").create();
 
-    private final Counter buildQueueTimeoutCounter = Counter.build()
-            .name("bamboo_build_queue_timeout_count")
-            .help("Build Queue Timeout Count")
-            .create();
+	private final Counter buildQueueTimeoutCounter = Counter.build().name("bamboo_build_queue_timeout_count")
+			.help("Build Queue Timeout Count").create();
 
-    //--> Deploys
+	// --> Deploys
 
-    private final Counter finishedDeploysCounter = Counter.build()
-            .name("bamboo_finished_deploys_count")
-            .help("Finished Deploys Count")
-            .labelNames("state")
-            .create();
+	private final Counter finishedDeploysCounter = Counter.build().name("bamboo_finished_deploys_count")
+			.help("Finished Deploys Count").labelNames("state").create();
 
-    //--> License
+	// --> License
 
-    private final Gauge maintenanceExpiryDaysGauge = Gauge.build()
-            .name("bamboo_maintenance_expiry_days_gauge")
-            .help("Maintenance Expiry Days Gauge")
-            .create();
+	private final Gauge maintenanceExpiryDaysGauge = Gauge.build().name("bamboo_maintenance_expiry_days_gauge")
+			.help("Maintenance Expiry Days Gauge").create();
 
-    private final Gauge licenseExpiryDaysGauge = Gauge.build()
-            .name("bamboo_license_expiry_days_gauge")
-            .help("License Expiry Days Gauge")
-            .create();
+	private final Gauge licenseExpiryDaysGauge = Gauge.build().name("bamboo_license_expiry_days_gauge")
+			.help("License Expiry Days Gauge").create();
 
-    private final Gauge allowedUsersGauge = Gauge.build()
-            .name("bamboo_allowed_users_gauge")
-            .help("Allowed Users Gauge")
-            .create();
+	private final Gauge allowedUsersGauge = Gauge.build().name("bamboo_allowed_users_gauge").help("Allowed Users Gauge")
+			.create();
 
-    //--> Plans
+	// --> Plans
 
-    private final Gauge plansGauge = Gauge.build()
-            .name("bamboo_plans_gauge")
-            .help("Plans By Type (top, branch) Gauge")
-            .labelNames("type")
-            .create();
+	private final Gauge plansGauge = Gauge.build().name("bamboo_plans_gauge").help("Plans By Type (top, branch) Gauge")
+			.labelNames("type").create();
 
-    //--> Workers
+	// --> Workers
 
-    private final Gauge planWorkerIdleGauge = Gauge.build()
-            .name("bamboo_plans_workers_idle_gauge")
-            .help("Plan Workers Idle Gauge")
-            .create();
+	private final Gauge planWorkerIdleGauge = Gauge.build().name("bamboo_plans_workers_idle_gauge")
+			.help("Plan Workers Idle Gauge").create();
 
-    private final Gauge planWorkerBusyGauge = Gauge.build()
-            .name("bamboo_plans_workers_busy_gauge")
-            .help("Plan Workers Busy Gauge")
-            .create();
+	private final Gauge planWorkerBusyGauge = Gauge.build().name("bamboo_plans_workers_busy_gauge")
+			.help("Plan Workers Busy Gauge").create();
 
-    private final Gauge planWorkerQueueGauge = Gauge.build()
-            .name("bamboo_plans_workers_queue_gauge")
-            .help("Plan Workers Queue Size Gauge")
-            .create();
+	private final Gauge planWorkerQueueGauge = Gauge.build().name("bamboo_plans_workers_queue_gauge")
+			.help("Plan Workers Queue Size Gauge").create();
 
-    public MetricCollectorImpl(
-            @BambooImport BambooLicenseManager bambooLicenseManager,
-            @BambooImport AgentManager agentManager,
-            @BambooImport NonBlockingPlanExecutionService nonBlockingPlanExecutionService,
-            @BambooImport PlanManager planManager,
-            @BambooImport NodeLifecycleProvider nodeLifecycleProvider) {
-        this.bambooLicenseManager = bambooLicenseManager;
-        this.agentManager = agentManager;
-        this.nonBlockingPlanExecutionService = nonBlockingPlanExecutionService;
-        this.planManager = planManager;
-        this.nodeLifecycleProvider = nodeLifecycleProvider;
-        this.registry = CollectorRegistry.defaultRegistry;
-    }
+	public MetricCollectorImpl(@BambooImport BambooLicenseManager bambooLicenseManager,
+			@BambooImport AgentManager agentManager,
+			@BambooImport NonBlockingPlanExecutionService nonBlockingPlanExecutionService,
+			@BambooImport PlanManager planManager, @BambooImport NodeLifecycleProvider nodeLifecycleProvider) {
+		this.bambooLicenseManager = bambooLicenseManager;
+		this.agentManager = agentManager;
+		this.nonBlockingPlanExecutionService = nonBlockingPlanExecutionService;
+		this.planManager = planManager;
+		this.nodeLifecycleProvider = nodeLifecycleProvider;
+		this.registry = CollectorRegistry.defaultRegistry;
+	}
 
-    // Implementations
+	// Implementations
 
-    //--> Common
+	// --> Common
 
-    @Override
-    public void errorsCounter(boolean isNew) {
-        errorsCounter.labels(String.valueOf(isNew)).inc();
-    }
+	@Override
+	public void errorsCounter(boolean isNew) {
+		errorsCounter.labels(String.valueOf(isNew)).inc();
+	}
 
-    //--> Builds
+	// --> Builds
 
-    @Override
-    public void finishedBuildsCounter(String state) {
-        finishedBuildsCounter.labels(state).inc();
-    }
+	@Override
+	public void finishedBuildsCounter(String state) {
+		finishedBuildsCounter.labels(state).inc();
+	}
 
-    @Override
-    public void finishedBuildsDuration(long durationMillis) {
-        finishedBuildsDuration.observe(durationMillis / 1000.0);
-    }
+	@Override
+	public void finishedBuildsDuration(long durationMillis) {
+		finishedBuildsDuration.observe(durationMillis / 1000.0);
+	}
 
-    @Override
-    public void canceledBuildsCounter() {
-        canceledBuildsCounter.inc();
-    }
+	@Override
+	public void canceledBuildsCounter() {
+		canceledBuildsCounter.inc();
+	}
 
-    @Override
-    public void buildQueueTimeoutCounter() {
-        buildQueueTimeoutCounter.inc();
-    }
+	@Override
+	public void buildQueueTimeoutCounter() {
+		buildQueueTimeoutCounter.inc();
+	}
 
-    //--> Deploys
+	// --> Deploys
 
-    @Override
-    public void finishedDeploysCounter(String state) {
-        finishedDeploysCounter.labels(state).inc();
-    }
+	@Override
+	public void finishedDeploysCounter(String state) {
+		finishedDeploysCounter.labels(state).inc();
+	}
 
-    //--> Collect
+	// --> Collect
 
-    private List<MetricFamilySamples> collectInternal() {
-        // node lifecycle (was ServerLifecycleProvider in Bamboo <= 11)
-        lifecycleStateGauge.set(nodeLifecycleProvider.getNodeLifecycleState().ordinal());
+	private List<MetricFamilySamples> collectInternal() {
+		// node lifecycle (was ServerLifecycleProvider in Bamboo <= 11)
+		lifecycleStateGauge.set(nodeLifecycleProvider.getNodeLifecycleState().ordinal());
 
-        // license
-        BambooLicense bambooLicense = bambooLicenseManager.getLicense();
-        if (bambooLicense != null) {
-            // because nullable
-            if (bambooLicense.getMaintenanceExpiryDate() != null) {
-                maintenanceExpiryDaysGauge.set(DAYS.convert(bambooLicense.getMaintenanceExpiryDate().getTime() - System.currentTimeMillis(), MILLISECONDS));
-            }
-            // because nullable
-            if (bambooLicense.getExpiryDate() != null) {
-                licenseExpiryDaysGauge.set(DAYS.convert(bambooLicense.getExpiryDate().getTime() - System.currentTimeMillis(), MILLISECONDS));
-            }
-            allowedUsersGauge.set(bambooLicense.getMaximumNumberOfUsers());
-        }
+		// license
+		BambooLicense bambooLicense = bambooLicenseManager.getLicense();
+		if (bambooLicense != null) {
+			// because nullable
+			if (bambooLicense.getMaintenanceExpiryDate() != null) {
+				maintenanceExpiryDaysGauge.set(DAYS.convert(
+						bambooLicense.getMaintenanceExpiryDate().getTime() - System.currentTimeMillis(), MILLISECONDS));
+			}
+			// because nullable
+			if (bambooLicense.getExpiryDate() != null) {
+				licenseExpiryDaysGauge.set(DAYS
+						.convert(bambooLicense.getExpiryDate().getTime() - System.currentTimeMillis(), MILLISECONDS));
+			}
+			allowedUsersGauge.set(bambooLicense.getMaximumNumberOfUsers());
+		}
 
-        // agents
-        allAgentsGauge.set(agentManager.getAllAgents().size());
-        activeAgentsGauge.set(agentManager.getActiveAndEnabledAgents().size());
-        busyAgentsGauge.set(agentManager.getBusyBuildAgents().size());
+		// agents
+		allAgentsGauge.set(agentManager.getAllAgents().size());
+		activeAgentsGauge.set(agentManager.getActiveAndEnabledAgents().size());
+		busyAgentsGauge.set(agentManager.getBusyBuildAgents().size());
 
-        // plans
-        plansGauge.labels("top").set(planManager.getPlanCount(TopLevelPlan.class));
-        plansGauge.labels("branch").set(planManager.getPlanCount(ChainBranch.class));
+		// plans
+		plansGauge.labels("top").set(planManager.getPlanCount(TopLevelPlan.class));
+		plansGauge.labels("branch").set(planManager.getPlanCount(ChainBranch.class));
 
-        // workers
-        final ExecutorStats planExecutorStats = this.nonBlockingPlanExecutionService.getExecutorStats();
-        final int planExecutorStatsActiveCount = planExecutorStats.getActiveCount();
-        planWorkerIdleGauge.set(planExecutorStats.getPoolSize() - planExecutorStatsActiveCount);
-        planWorkerBusyGauge.set(planExecutorStatsActiveCount);
-        planWorkerQueueGauge.set(planExecutorStats.getEventsQueue().size());
+		// workers
+		final ExecutorStats planExecutorStats = this.nonBlockingPlanExecutionService.getExecutorStats();
+		final int planExecutorStatsActiveCount = planExecutorStats.getActiveCount();
+		planWorkerIdleGauge.set(planExecutorStats.getPoolSize() - planExecutorStatsActiveCount);
+		planWorkerBusyGauge.set(planExecutorStatsActiveCount);
+		planWorkerQueueGauge.set(planExecutorStats.getEventsQueue().size());
 
-        List<MetricFamilySamples> result = new ArrayList<>();
-        result.addAll(lifecycleStateGauge.collect());
-        result.addAll(errorsCounter.collect());
-        result.addAll(finishedBuildsCounter.collect());
-        result.addAll(finishedBuildsDuration.collect());
-        result.addAll(canceledBuildsCounter.collect());
-        result.addAll(finishedDeploysCounter.collect());
-        result.addAll(buildQueueTimeoutCounter.collect());
-        // license
-        result.addAll(maintenanceExpiryDaysGauge.collect());
-        result.addAll(licenseExpiryDaysGauge.collect());
-        result.addAll(allowedUsersGauge.collect());
-        // agents
-        result.addAll(allAgentsGauge.collect());
-        result.addAll(activeAgentsGauge.collect());
-        result.addAll(busyAgentsGauge.collect());
-        // plans
-        result.addAll(plansGauge.collect());
-        // workers
-        result.addAll(planWorkerIdleGauge.collect());
-        result.addAll(planWorkerBusyGauge.collect());
-        result.addAll(planWorkerQueueGauge.collect());
+		List<MetricFamilySamples> result = new ArrayList<>();
+		result.addAll(lifecycleStateGauge.collect());
+		result.addAll(errorsCounter.collect());
+		result.addAll(finishedBuildsCounter.collect());
+		result.addAll(finishedBuildsDuration.collect());
+		result.addAll(canceledBuildsCounter.collect());
+		result.addAll(finishedDeploysCounter.collect());
+		result.addAll(buildQueueTimeoutCounter.collect());
+		// license
+		result.addAll(maintenanceExpiryDaysGauge.collect());
+		result.addAll(licenseExpiryDaysGauge.collect());
+		result.addAll(allowedUsersGauge.collect());
+		// agents
+		result.addAll(allAgentsGauge.collect());
+		result.addAll(activeAgentsGauge.collect());
+		result.addAll(busyAgentsGauge.collect());
+		// plans
+		result.addAll(plansGauge.collect());
+		// workers
+		result.addAll(planWorkerIdleGauge.collect());
+		result.addAll(planWorkerBusyGauge.collect());
+		result.addAll(planWorkerQueueGauge.collect());
 
-        return result;
-    }
+		return result;
+	}
 
-    @Override
-    public List<MetricFamilySamples> collect() {
-        long start = System.currentTimeMillis();
-        try {
-            return collectInternal();
-        } catch (Throwable throwable) {
-            log.error("Error collect prometheus metrics", throwable);
-            return emptyList();
-        } finally {
-            log.debug("Collect execution time is: {}ms", System.currentTimeMillis() - start);
-        }
-    }
+	@Override
+	public List<MetricFamilySamples> collect() {
+		long start = System.currentTimeMillis();
+		try {
+			return collectInternal();
+		} catch (Throwable throwable) {
+			log.error("Error collect prometheus metrics", throwable);
+			return emptyList();
+		} finally {
+			log.debug("Collect execution time is: {}ms", System.currentTimeMillis() - start);
+		}
+	}
 
-    @Override
-    public void destroy() {
-        this.registry.unregister(this);
-    }
+	@Override
+	public void destroy() {
+		this.registry.unregister(this);
+	}
 
-    @Override
-    public void afterPropertiesSet() {
-        this.registry.register(this);
-        DefaultExports.initialize();
-    }
+	@Override
+	public void afterPropertiesSet() {
+		this.registry.register(this);
+		DefaultExports.initialize();
+	}
 
-    @Override
-    public CollectorRegistry getRegistry() {
-        return registry;
-    }
+	@Override
+	public CollectorRegistry getRegistry() {
+		return registry;
+	}
 }
