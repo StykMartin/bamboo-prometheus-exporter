@@ -3,24 +3,25 @@ package ru.andreymarkelov.atlas.plugins.prombambooexporter.action.admin;
 import com.atlassian.bamboo.configuration.GlobalAdminAction;
 import com.atlassian.bamboo.security.BambooPermissionManager;
 import com.atlassian.bamboo.user.BambooAuthenticationContext;
-import com.atlassian.struts.Preparable;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.user.User;
+import org.apache.struts2.ActionContext;
+import org.apache.struts2.Preparable;
+import org.apache.struts2.interceptor.parameter.StrutsParameter;
 import ru.andreymarkelov.atlas.plugins.prombambooexporter.manager.SecureTokenManager;
 
-import static com.opensymphony.xwork2.ActionContext.getContext;
-
 public class SecureTokenConfigAction extends GlobalAdminAction implements Preparable {
-    private final SecureTokenManager secureTokenManager;
-    private final BambooAuthenticationContext bambooAuthenticationContext;
-    private final BambooPermissionManager bambooPermissionManager;
+    private final transient SecureTokenManager secureTokenManager;
+    private final transient BambooAuthenticationContext bambooAuthenticationContext;
+    private final transient BambooPermissionManager bambooPermissionManager;
 
     private boolean saved;
     private String token;
 
     public SecureTokenConfigAction(
             SecureTokenManager secureTokenManager,
-            BambooAuthenticationContext bambooAuthenticationContext,
-            BambooPermissionManager bambooPermissionManager) {
+            @ComponentImport BambooAuthenticationContext bambooAuthenticationContext,
+            @ComponentImport BambooPermissionManager bambooPermissionManager) {
         this.secureTokenManager = secureTokenManager;
         this.bambooAuthenticationContext = bambooAuthenticationContext;
         this.bambooPermissionManager = bambooPermissionManager;
@@ -46,7 +47,7 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
 
     @Override
     public void prepare() {
-        getContext().put("baseurl", getBambooUrl().rootContext());
+        ActionContext.getContext().put("baseurl", getBambooUrl().rootContext());
     }
 
     public boolean isSaved() {
@@ -61,6 +62,7 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
         return token;
     }
 
+    @StrutsParameter
     public void setToken(String token) {
         this.token = token;
     }

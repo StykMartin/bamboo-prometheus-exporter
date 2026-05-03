@@ -1,6 +1,6 @@
 package ru.andreymarkelov.atlas.plugins.prombambooexporter.manager;
 
-import com.atlassian.bamboo.ServerLifecycleProvider;
+import com.atlassian.bamboo.NodeLifecycleProvider;
 import com.atlassian.bamboo.buildqueue.manager.AgentManager;
 import com.atlassian.bamboo.event.spi.ExecutorStats;
 import com.atlassian.bamboo.license.BambooLicenseManager;
@@ -9,6 +9,8 @@ import com.atlassian.bamboo.plan.PlanManager;
 import com.atlassian.bamboo.plan.TopLevelPlan;
 import com.atlassian.bamboo.plan.branch.ChainBranch;
 import com.atlassian.extras.api.bamboo.BambooLicense;
+import com.atlassian.plugin.spring.scanner.annotation.component.BambooComponent;
+import com.atlassian.plugin.spring.scanner.annotation.imports.BambooImport;
 import io.prometheus.client.*;
 import io.prometheus.client.hotspot.DefaultExports;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+@BambooComponent
 public class MetricCollectorImpl extends Collector implements MetricCollector, InitializingBean, DisposableBean {
     private static final Logger log = LoggerFactory.getLogger(MetricCollectorImpl.class);
 
@@ -31,7 +34,7 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
     private final AgentManager agentManager;
     private final NonBlockingPlanExecutionService nonBlockingPlanExecutionService;
     private final PlanManager planManager;
-    private final ServerLifecycleProvider serverLifecycleProvider;
+    private final NodeLifecycleProvider nodeLifecycleProvider;
 
     //--> Common
 
@@ -140,16 +143,16 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
             .create();
 
     public MetricCollectorImpl(
-            BambooLicenseManager bambooLicenseManager,
-            AgentManager agentManager,
-            NonBlockingPlanExecutionService nonBlockingPlanExecutionService,
-            PlanManager planManager,
-            ServerLifecycleProvider serverLifecycleProvider) {
+            @BambooImport BambooLicenseManager bambooLicenseManager,
+            @BambooImport AgentManager agentManager,
+            @BambooImport NonBlockingPlanExecutionService nonBlockingPlanExecutionService,
+            @BambooImport PlanManager planManager,
+            @BambooImport NodeLifecycleProvider nodeLifecycleProvider) {
         this.bambooLicenseManager = bambooLicenseManager;
         this.agentManager = agentManager;
         this.nonBlockingPlanExecutionService = nonBlockingPlanExecutionService;
         this.planManager = planManager;
-        this.serverLifecycleProvider = serverLifecycleProvider;
+        this.nodeLifecycleProvider = nodeLifecycleProvider;
         this.registry = CollectorRegistry.defaultRegistry;
     }
 
@@ -194,8 +197,8 @@ public class MetricCollectorImpl extends Collector implements MetricCollector, I
     //--> Collect
 
     private List<MetricFamilySamples> collectInternal() {
-        // server states
-        lifecycleStateGauge.set(serverLifecycleProvider.getServerLifecycleState().ordinal());
+        // node lifecycle (was ServerLifecycleProvider in Bamboo <= 11)
+        lifecycleStateGauge.set(nodeLifecycleProvider.getNodeLifecycleState().ordinal());
 
         // license
         BambooLicense bambooLicense = bambooLicenseManager.getLicense();

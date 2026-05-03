@@ -1,12 +1,15 @@
 package ru.andreymarkelov.atlas.plugins.prombambooexporter.manager;
 
+import com.atlassian.plugin.spring.scanner.annotation.component.BambooComponent;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 
+@BambooComponent
 public class SecureTokenManagerImpl implements SecureTokenManager {
     private final PluginSettings pluginSettings;
 
-    public SecureTokenManagerImpl(PluginSettingsFactory pluginSettingsFactory) {
+    public SecureTokenManagerImpl(@ComponentImport PluginSettingsFactory pluginSettingsFactory) {
         this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
     }
 

@@ -1,13 +1,13 @@
 package ru.andreymarkelov.atlas.plugins.prombambooexporter.servlet;
 
 import io.prometheus.client.exporter.common.TextFormat;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import ru.andreymarkelov.atlas.plugins.prombambooexporter.manager.MetricCollector;
 import ru.andreymarkelov.atlas.plugins.prombambooexporter.manager.SecureTokenManager;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
@@ -16,8 +16,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PrometheusExporter extends HttpServlet {
-    private final MetricCollector metricCollector;
-    private final SecureTokenManager secureTokenManager;
+    private final transient MetricCollector metricCollector;
+    private final transient SecureTokenManager secureTokenManager;
 
     public PrometheusExporter(
             MetricCollector metricCollector,

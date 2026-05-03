@@ -41,7 +41,7 @@
                         [@ww.textfield
                             labelKey="ru.andreymarkelov.atlas.plugins.prombambooexporter.admin.settings.token"
                             name="token"
-                            required="false"
+                            required=false
                             descriptionKey="ru.andreymarkelov.atlas.plugins.prombambooexporter.admin.settings.token.desc"
                         /]
                     [/@ww.form]
