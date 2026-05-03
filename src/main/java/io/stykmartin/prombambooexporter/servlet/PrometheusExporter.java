@@ -1,5 +1,6 @@
 package io.stykmartin.prombambooexporter.servlet;
 
+import com.atlassian.annotations.security.UnrestrictedAccess;
 import io.prometheus.client.exporter.common.TextFormat;
 import io.stykmartin.prombambooexporter.manager.MetricCollector;
 import io.stykmartin.prombambooexporter.manager.SecureTokenManager;
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+@UnrestrictedAccess
 public class PrometheusExporter extends HttpServlet {
     private final transient MetricCollector metricCollector;
     private final transient SecureTokenManager secureTokenManager;
