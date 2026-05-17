@@ -36,7 +36,7 @@
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
         <atlassian.spring.scanner.version>6.0.2</atlassian.spring.scanner.version>
         <prometheus.version>0.16.0</prometheus.version>
-        <spotless.version>3.4.0</spotless.version>
+        <spotless.version>3.5.1</spotless.version>
         <eclipse.jdt.version>4.35</eclipse.jdt.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
