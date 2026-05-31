@@ -32,7 +32,7 @@
     <properties>
         <bamboo.version>12.1.7</bamboo.version>
         <bamboo.data.version>${bamboo.version}</bamboo.data.version>
-        <amps.version>9.12.4</amps.version>
+        <amps.version>9.12.5</amps.version>
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
         <atlassian.spring.scanner.version>6.0.2</atlassian.spring.scanner.version>
         <prometheus.version>0.16.0</prometheus.version>
