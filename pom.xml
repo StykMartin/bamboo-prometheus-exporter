@@ -34,7 +34,7 @@
         <bamboo.data.version>${bamboo.version}</bamboo.data.version>
         <amps.version>9.12.6</amps.version>
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
-        <atlassian.spring.scanner.version>6.0.2</atlassian.spring.scanner.version>
+        <atlassian.spring.scanner.version>7.0.0</atlassian.spring.scanner.version>
         <prometheus.version>0.16.0</prometheus.version>
         <spotless.version>3.8.0</spotless.version>
         <eclipse.jdt.version>4.35</eclipse.jdt.version>
