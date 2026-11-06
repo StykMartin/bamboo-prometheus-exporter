@@ -14,7 +14,7 @@
                 <p>
                     <span class="aui-icon aui-icon-small aui-iconfont-info"></span>
                     ${action.getText('io.stykmartin.prombambooexporter.admin.settings.linkdesc')}
-                    <a target="_blank" href="${baseurl}/plugins/servlet/prometheus/metrics">
+                    <a target="_blank" href="${action.metricsUrl}">
                         ${action.getText('io.stykmartin.prombambooexporter.admin.settings.link')}
                     </a>.
                 </p>
