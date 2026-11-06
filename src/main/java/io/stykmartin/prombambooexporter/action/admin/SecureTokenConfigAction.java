@@ -4,28 +4,28 @@ import com.atlassian.bamboo.configuration.GlobalAdminAction;
 import com.atlassian.bamboo.security.BambooPermissionManager;
 import com.atlassian.bamboo.user.BambooAuthenticationContext;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.atlassian.sal.api.web.context.HttpContext;
 import com.atlassian.user.User;
 import io.stykmartin.prombambooexporter.manager.SecureTokenManager;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.struts2.ActionContext;
-import org.apache.struts2.Preparable;
-import org.apache.struts2.interceptor.parameter.StrutsParameter;
 
-public class SecureTokenConfigAction extends GlobalAdminAction implements Preparable {
+public class SecureTokenConfigAction extends GlobalAdminAction {
 	private final transient SecureTokenManager secureTokenManager;
 	private final transient BambooAuthenticationContext bambooAuthenticationContext;
 	private final transient BambooPermissionManager bambooPermissionManager;
+	private final transient HttpContext httpContext;
 
 	private boolean saved;
-	private String token;
-	private boolean clear;
 
 	public SecureTokenConfigAction(SecureTokenManager secureTokenManager,
 			@ComponentImport BambooAuthenticationContext bambooAuthenticationContext,
-			@ComponentImport BambooPermissionManager bambooPermissionManager) {
+			@ComponentImport BambooPermissionManager bambooPermissionManager,
+			@ComponentImport HttpContext httpContext) {
 		this.secureTokenManager = secureTokenManager;
 		this.bambooAuthenticationContext = bambooAuthenticationContext;
 		this.bambooPermissionManager = bambooPermissionManager;
+		this.httpContext = httpContext;
 	}
 
 	@Override
@@ -34,6 +34,9 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
 		if (user == null || !bambooPermissionManager.isAdmin(user.getName())) {
 			return ERROR;
 		}
+		HttpServletRequest request = httpContext.getRequest();
+		String token = request.getParameter("token");
+		boolean clear = Boolean.parseBoolean(request.getParameter("clear"));
 		if (clear) {
 			secureTokenManager.setToken("");
 			saved = true;
@@ -41,30 +44,21 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
 			secureTokenManager.setToken(token);
 			saved = true;
 		}
-		token = null;
-		clear = false;
 		return SUCCESS;
 	}
 
 	@Override
 	public String input() {
-		token = null;
-		clear = false;
 		saved = false;
 		return INPUT;
 	}
 
-	@Override
-	public void prepare() {
-		ActionContext.getContext().put("baseurl", getBambooUrl().rootContext());
+	public String getMetricsUrl() {
+		return getBambooUrl().rootContext() + "/plugins/servlet/prometheus/metrics";
 	}
 
 	public boolean isSaved() {
 		return saved;
-	}
-
-	public void setSaved(boolean saved) {
-		this.saved = saved;
 	}
 
 	public boolean isTokenConfigured() {
@@ -72,20 +66,10 @@ public class SecureTokenConfigAction extends GlobalAdminAction implements Prepar
 	}
 
 	public String getToken() {
-		return token;
-	}
-
-	@StrutsParameter
-	public void setToken(String token) {
-		this.token = token;
+		return null;
 	}
 
 	public boolean isClear() {
-		return clear;
-	}
-
-	@StrutsParameter
-	public void setClear(boolean clear) {
-		this.clear = clear;
+		return false;
 	}
 }
